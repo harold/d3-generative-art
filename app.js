@@ -2,7 +2,6 @@
 // Variables
 var margin = 5
 var speed = 10
-var rotationSpeed = Math.PI / 2
 
 function LSystem(init, rules, generations) {
   var out = init
@@ -34,35 +33,32 @@ function* Turtle(commands) {
   }
 }
 
-function minMaxReducer([x1, y1, x2, y2], [lx1, ly1, lx2, ly2]) {
-  return [Math.min(x1, x2, lx1, lx2),
-          Math.min(y1, y2, ly1, ly2),
-          Math.max(x1, x2, lx1, lx2),
-          Math.max(y1, y2, ly1, ly2)]
+function minMax([x1, y1, x2, y2], [lx1, ly1, lx2, ly2]) {
+  return [Math.min(x1, x2, lx1, lx2), Math.min(y1, y2, ly1, ly2),
+          Math.max(x1, x2, lx1, lx2), Math.max(y1, y2, ly1, ly2)]
 }
 
 var generator;
+var rotationSpeed;
 if( location.href.includes("dragon") ) {
   generator = Turtle(LSystem("FX", {"X": "X+YF+", "Y": "-FX-Y"}, 12))
+  rotationSpeed = Math.PI / 2
 } else {
   generator = Turtle(LSystem("F+F+F+F+F+F", {"F": "F-F++F-F"}, 4))
   rotationSpeed = Math.PI / 3
 }
 
 var data = []
+var viewBoxData = [0, 0, 0, 0]
 
 function frame() {
   var v = generator.next().value
   if(v) {
     data.push(v)
-    var viewBoxData = data.reduce(minMaxReducer)
+    viewBoxData = minMax(v, viewBoxData)
     var w = viewBoxData[2] - viewBoxData[0]
     var h = viewBoxData[3] - viewBoxData[1]
-    viewBox =
-      (viewBoxData[0] - margin) + " " +
-      (viewBoxData[1] - margin) + " " +
-      (w + 2 * margin) + " " +
-      (h + 2 * margin) + " "
+    viewBox = `${(viewBoxData[0] - margin)} ${(viewBoxData[1] - margin)} ${(w + 2 * margin)} ${(h + 2 * margin)}`
 
     d3.select("#drawing")
       .attr("viewBox", viewBox)
