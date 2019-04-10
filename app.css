@@ -1,0 +1,7 @@
+* { margin:0; padding:0; }
+
+html, body, svg { width:100%; height:100%; overflow:hidden; }
+
+body { background:#f8f8f8; }
+
+line { stroke:#222; stroke-width:4; stroke-linecap:round; vector-effect:non-scaling-stroke; }
