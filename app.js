@@ -66,11 +66,11 @@ function frame() {
       .attr("height", h)
       .selectAll("line")
       .data(data)
-      .join("line")
-      .attr("x1", d => d[0])
-      .attr("y1", d => d[1])
-      .attr("x2", d => d[2])
-      .attr("y2", d => d[3])
+      .join(enter => enter.append("line")
+                          .attr("x1", d => d[0])
+                          .attr("y1", d => d[1])
+                          .attr("x2", d => d[2])
+                          .attr("y2", d => d[3]))
     requestAnimationFrame(frame)
   }
 }
