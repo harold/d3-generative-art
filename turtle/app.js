@@ -1,20 +1,12 @@
-////////////////////////////////////////////////////////////////////////////////
-// Variables
-let margin = 5
-let speed = 10
-
 function LSystem(init, rules, generations) {
   let out = init
-  for( let i=0; i<generations; i++ ) {
-    out = out.replace(/./g, function(c) {
-      let replacement = rules[c]
-      return replacement ? replacement : c
-    })
-  }
+  for( let i=0; i<generations; i++ )
+    out = out.replace(/./g, c => rules[c] || c)
   return out
 }
 
-function* Turtle(commands) {
+function* Turtle(commands, rotationSpeed) {
+  let speed = 10
   let theta = 0
   let x = 0
   let y = 0
@@ -22,8 +14,7 @@ function* Turtle(commands) {
   for( let i=0; i<commands.length; i++ ) {
     let c = commands[i]
     if( "F" == c ) {
-      let oldX = x
-      let oldY = y
+      let [oldX, oldY] = [x, y]
       x += speed * Math.cos(theta)
       y += speed * Math.sin(theta)
       yield [oldX, oldY, x, y]
@@ -39,13 +30,10 @@ function minMax([x1, y1, x2, y2], [lx1, ly1, lx2, ly2]) {
 }
 
 var generator
-var rotationSpeed
 if( location.href.includes("dragon") ) {
-  generator = Turtle(LSystem("FX", {"X": "X+YF+", "Y": "-FX-Y"}, 12))
-  rotationSpeed = Math.PI / 2
+  generator = Turtle(LSystem("FX", {"X": "X+YF+", "Y": "-FX-Y"}, 12), Math.PI / 2)
 } else {
-  generator = Turtle(LSystem("F+F+F+F+F+F", {"F": "F-F++F-F"}, 4))
-  rotationSpeed = Math.PI / 3
+  generator = Turtle(LSystem("F+F+F+F+F+F", {"F": "F-F++F-F"}, 4), Math.PI / 3)
 }
 
 let data = []
@@ -58,6 +46,7 @@ function frame() {
     viewBoxData = minMax(v, viewBoxData)
     let w = viewBoxData[2] - viewBoxData[0]
     let h = viewBoxData[3] - viewBoxData[1]
+    let margin = 5
     viewBox = `${(viewBoxData[0] - margin)} ${(viewBoxData[1] - margin)} ${(w + 2 * margin)} ${(h + 2 * margin)}`
 
     d3.select("#drawing")
